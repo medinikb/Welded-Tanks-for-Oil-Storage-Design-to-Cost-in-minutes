@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="TankM dual-mode owner Class 3 API 650 design-to-weight-to-cost screening application." />
+  <title>TankM | Design → Class 3 Weight → Owner Cost Intelligence</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .header-walkthrough{background:rgba(255,255,255,.08);color:#fff;cursor:pointer}
+    .header-walkthrough:hover{border-color:#fdd017;color:#fdd017;background:rgba(253,208,23,.10)}
+    .tankm-hero-actions button{font-weight:500!important}
+    .feed-batch-workspace{display:grid;gap:20px;padding:20px 0}
+    .feed-batch-workspace .batch-drop-zone{margin-top:0}
+    .feed-batch-workspace .batch-file-status{margin:0}
+    .feed-batch-workspace .batch-columns,.feed-batch-workspace .batch-auto-note{margin:0}
+    .tankm-hero-primary{border-color:#fdd017;background:#fdd017;color:#071d35!important}
+    .tankm-hero-primary:hover{background:#ffdc43;border-color:#ffdc43}
+    .tankm-feature-icon{color:#fdd017!important}
+    .batch-register-filters{position:relative;background:#f7faff;border-bottom:1px solid #d7e3f1}
+    .batch-register-filters::before{content:"Calculation register  ·  filter and review imported tank rows";display:block;grid-column:1/-1;margin-bottom:2px;color:#123b61;font-size:14px;font-weight:800;letter-spacing:.01em}
+    #batchRegisterPanel .batch-results-wrap{border:1px solid #c9d8e8;border-radius:10px;box-shadow:0 8px 20px rgba(16,44,77,.06)}
+    #batchRegisterPanel table{min-width:1180px}
+    #batchRegisterPanel th{background:#123b61;color:#fff;border-bottom:0;padding:11px 10px;font-size:10px;letter-spacing:.06em}
+    #batchRegisterPanel td{padding:10px;border-bottom:1px solid #e4ebf3;font-size:12px}
+    #batchRegisterPanel tbody tr:nth-child(even) td{background:#f8fbfe}
+    #batchRegisterPanel tbody tr:hover td{background:#eef6ff}
+    #batchRegisterPanel td:first-child{color:#5b7390;font-size:11px}
+    #batchRegisterPanel .batch-status{display:inline-flex;min-width:78px;justify-content:center;letter-spacing:.04em}
+    #batchSearchInput{border-color:#b8cbe0;background:#fff}
+    #batchSourceFilter,#batchStatusFilter{border-color:#b8cbe0;background:#fff}
+    .feed-template-callout h2::before{content:"1";display:inline-grid;place-items:center;width:27px;height:27px;margin-right:7px;border-radius:50%;background:#0ea5a4;color:#fff;font-size:13px;font-weight:800;vertical-align:middle}
+    .brand-lockup{display:flex;align-items:center;gap:11px}
+    .brand-link{display:block;color:inherit;text-decoration:none;cursor:pointer}
+    .brand-link:focus-visible{outline:2px solid #fdd017;outline-offset:4px;border-radius:6px}
+    .case-control-primary{margin-top:0!important;padding:11px 12px}
+    .case-control-status{display:flex;align-items:flex-start;gap:7px;margin:9px 0 3px;padding:8px 9px;border:1px solid #31536d;border-radius:7px;background:#102a3d;color:#c7d5e3;font-size:11px;line-height:1.35}
+    .case-control-status::before{content:"";flex:0 0 8px;width:8px;height:8px;margin-top:3px;border-radius:50%;background:#22c55e}
+    .case-control-status.dirty{color:#ffddb0;border-color:#76502b;background:#332a20}
+    .case-control-status.dirty::before{background:#f59e0b}
+    .case-control-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+    .case-control-grid .secondary{min-width:0;margin:0;padding:8px 6px;font-size:11px}
+    .case-control-new{margin-top:7px!important;background:transparent!important;color:#dbeafe!important;border-color:#47647b!important}
+    .brand-mark{display:flex;align-items:center;justify-content:center;gap:1px;width:42px;height:42px;border-radius:12px;background:#0d3942;color:#fff;font-size:13px;font-weight:800;letter-spacing:0;white-space:nowrap;box-shadow:0 5px 14px rgba(0,0,0,.20)}
+    .tankm-hero-features{display:flex;grid-template-columns:none;gap:28px;width:max-content;max-width:550px}
+    .tankm-hero-features>div{flex:0 0 auto;padding-left:10px;padding-right:10px}
+    .tankm-hero-features>div:first-child{padding-left:0}
+    @media(max-width:760px){.tankm-hero-features{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:auto;max-width:none}}
+    .tankm-hero{background-image:url("assets/tankm-hero-v2-neutral.png")!important;background-blend-mode:normal}
+    .tankm-hero::after{background:linear-gradient(90deg,rgba(3,21,40,.82) 0%,rgba(4,27,51,.46) 58%,rgba(5,29,52,.08) 84%,transparent 100%)!important}
+    .tankm-hero-capacity{position:absolute;z-index:2;top:105px;right:auto;left:calc(88% - 250px);width:250px;padding:11px 18px;border:1px solid rgba(255,255,255,.48);border-radius:999px;background:rgba(5,31,55,.48);color:#fdd017;font-size:17px;font-weight:400;letter-spacing:.02em;box-shadow:0 8px 24px rgba(0,0,0,.18);backdrop-filter:blur(7px);animation:tankm-capacity-badge 5s steps(20,end) infinite alternate}
+    .tankm-hero-capacity span{display:block;width:1ch;overflow:hidden;white-space:nowrap;animation:tankm-capacity-type 5s steps(20,end) infinite alternate}
+    @keyframes tankm-capacity-type{0%,12%{width:1ch}88%,100%{width:21ch}}
+    @keyframes tankm-capacity-badge{0%,12%{width:58px}88%,100%{width:250px}}
+    @media(prefers-reduced-motion:reduce){.tankm-hero-capacity{width:250px;animation:none}.tankm-hero-capacity span{width:21ch;animation:none}}
+    @media(max-width:1000px){.tankm-hero-capacity{top:30px;right:auto;left:calc(100% - 288px)}}
+    @media(max-width:760px){.tankm-hero-capacity{top:auto;right:auto;bottom:230px;left:24px;font-size:14px}}
+  </style>
+</head>
+<body class="home-active">
+<header class="topbar">
+  <div><a class="brand-link" href="#home" data-go-to="home" aria-label="Go to Home"><div class="brand-lockup"><span class="brand-mark" aria-hidden="true">T<span style="color:#fdd017">M</span></span><div class="brand">Tank<span style="color:#fdd017">M</span></div></div></a><div class="tagline">Design to Cost in minutes</div></div>
+  <div class="header-badges"><button class="badge header-walkthrough" type="button" data-go-to="walkthrough">Junior Engineer Walkthrough</button><span class="badge">API 650 12th Ed + Add.3 (2018) engine</span></div>
+</header>
+
+<main class="layout">
+<aside class="sidebar">
+  <button id="sidebarToggleBtn" class="sidebar-toggle" type="button" aria-label="Collapse sidebar" aria-expanded="true"><span class="sidebar-toggle-icon">‹</span><span class="sidebar-toggle-label">Collapse menu</span></button>
+  <nav>
+    <button class="nav-btn active" data-target="home">Home</button>
+    <button class="nav-btn" data-target="aiAssistant">AI assistant</button>
+    <button class="nav-btn" data-target="feedBatch">FEED batch design-to-cost</button>
+    <button class="nav-btn" data-target="basis">1. Design basis</button>
+    <button class="nav-btn" data-target="shell">2. Shell</button>
+    <button class="nav-btn" data-target="bottom">3. Bottom & annular</button>
+    <button class="nav-btn" data-target="roof">4. Roof</button>
+    <button class="nav-btn" data-target="wind">5. Wind</button>
+    <button class="nav-btn" data-target="pressure">6. Pressure & anchorage</button>
+    <button class="nav-btn" data-target="seismicPanel">7. Seismic</button>
+    <button class="nav-btn" data-target="floating">8. Floating roof</button>
+    <button class="nav-btn" data-target="openings">9. Nozzles & manholes</button>
+    <button class="nav-btn" data-target="mto">10. Weight / MTO</button>
+    <button class="nav-btn" data-target="cost">11. Cost intelligence</button>
+    <button class="nav-btn" data-target="validation">Validation Lab</button>
+    <button class="nav-btn" data-target="report">Report</button>
+  </nav>
+  <div class="side-card"><div class="side-card-title">Workflow status</div><div id="overallStatus" class="status review">REVIEW</div><div id="overallStatusText" class="small muted">Run design to evaluate gates.</div><div class="mini-status"><span>Engineering</span><strong id="engineeringStatus">-</strong></div><div class="mini-status"><span>Class 3 estimate</span><strong id="estimateStatus">-</strong></div></div>
+  <div class="side-card"><div class="side-card-title">Case Controls</div><button id="runBtn" class="primary full case-control-primary" type="button">Run / Update Estimate</button><div id="caseControlStatus" class="case-control-status" aria-live="polite">Estimate is current.</div><div class="case-control-grid"><button id="saveBtn" class="secondary" type="button">Save Case</button><button id="loadBtn" class="secondary" type="button">Load Case</button><input id="caseFileInput" class="hidden" type="file" accept=".json,application/json" aria-label="Select a TankM case JSON file" /></div><button id="newCaseBtn" class="secondary full case-control-new" type="button">Start New Case</button></div>
+</aside>
+
+<section class="content">
+<section id="home" class="panel active-panel tankm-home">
+  <div class="tankm-hero">
+    <div class="tankm-hero-capacity"><span>Assess up to 99 tanks</span></div>
+    <div class="tankm-hero-content">
+      <p class="tankm-hero-eyebrow" style="font-weight:400">API 650 · Class 3 target: -20% / +30%</p>
+      <h1 style="font-weight:600">Welded <span class="tankm-storage-word">Tanks</span> for Oil Storage</h1>
+      <p class="tankm-hero-lead">Estimate the weight and cost of up to 99 tanks in minutes, not weeks.</p>
+      <div class="tankm-hero-actions"><button class="tankm-hero-primary" data-go-to="basis">Start single-tank estimate <span>→</span></button><button class="tankm-hero-secondary" data-go-to="feedBatch">Run FEED batch <span>↑</span></button></div>
+      <div class="tankm-hero-features">
+        <div><span class="tankm-feature-icon">◇</span><strong>100% local</strong></div>
+        <div><span class="tankm-feature-icon">▫</span><strong>Private</strong></div>
+        <div><span class="tankm-feature-icon">☁</span><strong>No cloud upload</strong></div>
+      </div>
+    </div>
+    <div class="tankm-hero-trust"><div><strong>Single + Batch</strong><span>Two estimating workflows</span></div><div><strong>Class 3</strong><span>-20% / +30% target</span></div><div><strong>Browser-local</strong><span>Your files stay private</span></div><div><strong>Traceable</strong><span>Equations and assumptions</span></div></div>
+  </div>
+  <div class="tankm-home-note"><strong>Class 3 screening tool:</strong> supports preliminary owner estimates. Final API 650 design, purchaser review, and fabrication release require engineering approval.</div>
+</section>
+<section id="aiAssistant" class="panel"><div class="panel-head"><div><h1>AI FEED Assistant</h1><p>Reviews TankM inputs and explains published results. It cannot change engineering inputs, calculations, weight, cost, or governance status.</p></div><div class="code-chip">Human review required</div></div><div class="grid two"><div class="card"><h2>1. Select approved provider</h2><label>AI provider<select id="aiProvider"></select></label><p class="small muted">OpenAI is ready now. DeepSeek becomes available when its server-side key is configured.</p><div id="aiStatus" class="ai-status">Checking local AI configuration…</div></div><div class="card"><h2>2. Ask the assistant</h2><p class="small muted">TankM sends the current approved inputs and calculated result to the selected provider. Review the answer before acting.</p><div class="actions"><button id="aiInputReviewBtn" class="primary">Review inputs & assumptions</button><button id="aiResultExplainBtn" class="secondary">Explain current result</button></div></div></div><div class="card"><h2>AI response</h2><div id="aiResponse" class="ai-response"><p class="muted">Run a TankM design, then ask for an input review or result explanation.</p></div></div><div class="callout warning-callout"><strong>Safety boundary:</strong> AI may explain, flag missing inputs, and suggest questions for a reviewer. It must not invent engineering data, claim code compliance, or replace TankM’s deterministic calculation engine.</div></section>
+<section id="walkthrough" class="panel">
+  <div class="panel-head"><div><h1>Junior Engineer Walkthrough</h1><p>Follow these screens in order to prepare a Class 3 FEED estimate. Blue values are entered from the 60,000 m³ crude-oil example; amber values are estimating assumptions until a GAD or approved data sheet confirms them.</p></div><div class="code-chip">Guided example</div></div>
+  <div class="callout warning-callout"><strong>Start here:</strong> this walkthrough produces a FEED screening estimate, not a fabrication design. For the 66.00 m drawing-based tank, Engineering will correctly remain <strong>HOLD</strong> while the Class 3 estimate may be <strong>SCREENING</strong>.</div>
+  <div class="walk-grid">
+    <article class="walk-step"><span>1</span><div><h2>Design basis</h2><p>Enter Class 3 Screening mode; quantity <strong>10</strong>; nominal and stored capacity <strong>60,000 m³</strong>; design/hydrotest level <strong>17.75 m</strong>; SG <strong>0.888</strong>; temperature <strong>65°C</strong>; MDMT <strong>11.3°C</strong>; wind <strong>234 km/h</strong>; seismic selected; EFR / double deck.</p><p class="walk-assumption">For the drawing-based example, use the approved diameter <strong>66.00 m</strong> and shell height <strong>19.50 m</strong>. Do not overwrite it with inferred 65.60 m unless the drawing dimension is unavailable.</p><button class="secondary" data-go-to="basis">Open Design basis</button></div></article>
+    <article class="walk-step"><span>2</span><div><h2>Still on Design basis: materials and courses</h2><p>Select <strong>ASTM A537M Class 1</strong>, API material group <strong>VI</strong>, bottom-shell CA <strong>3.0 mm</strong>, other-shell CA <strong>1.5 mm</strong>, bottom/annular CA <strong>3.0 mm</strong>, roof CA <strong>1.0 mm</strong>, and 2.5 m target course height.</p><p class="walk-assumption">Use the expanded plate series through 50 mm and 8% appurtenance allowance; click “Generate courses.”</p><button class="secondary" data-go-to="basis">Open material inputs</button></div></article>
+    <article class="walk-step"><span>3</span><div><h2>Shell: review, do not re-enter</h2><p>This screen is the output review. Check the course thicknesses and confirm the visible label says <strong>SCREENING PROXY</strong>, not a code design release.</p><button class="secondary" data-go-to="shell">Open Shell review</button></div></article>
+    <article class="walk-step"><span>4</span><div><h2>Bottom & annular</h2><p>Tick “Force annular.” For this example use <strong>14 mm</strong> annular thickness and <strong>900 mm</strong> radial width.</p><p class="walk-assumption">These values are not on the supplied datasheet; replace them when the GAD is available.</p><button class="secondary" data-go-to="bottom">Open Bottom & annular</button></div></article>
+    <article class="walk-step"><span>5</span><div><h2>Roof, wind, pressure, seismic, openings</h2><p>For EFR, the fixed-roof screen is not applicable. Leave unverified wind-girder and opening weights at zero, review pressure/anchorage, and retain the seismic review. Enter <strong>0</strong> kg/m² on Floating roof to use the disclosed 115.8 kg/m² double-deck screening basis.</p><button class="secondary" data-go-to="floating">Open Floating roof</button></div></article>
+    <article class="walk-step"><span>6</span><div><h2>Weight / MTO and Cost intelligence</h2><p>Click Run design. Review Core MTO, complete empty weight and Class 3 range. On Cost intelligence, keep 2026, raw-steel override 0, calibrated-weight basis, -20% / +30%, and ground reference unticked.</p><button class="secondary" data-go-to="mto">Open Weight / MTO</button> <button class="secondary" data-go-to="cost">Open Cost intelligence</button></div></article>
+  </div>
+  <div class="card"><h2>Expected example result</h2><div class="grid four"><div class="kpi"><span>Complete weight / tank</span><strong>1,541 MT</strong></div><div class="kpi"><span>Base LSTK cost / tank</span><strong>₹41.55 Cr</strong></div><div class="kpi"><span>10-tank LSTK cost</span><strong>₹415.46 Cr</strong></div><div class="kpi"><span>Estimate status</span><strong>SCREENING</strong></div></div></div>
+</section>
+<section id="feedBatch" class="panel">
+  <div class="feed-batch-hero"><div class="feed-batch-intro"><span class="feed-step">B</span><div><strong>FEED Batch Tank Design-to-Cost</strong><small>Upload and evaluate a complete tank register</small></div></div><span class="privacy-pill">Processed locally in your browser</span><h1>Multi-Tank Weight &amp; Cost Assessment</h1></div>
+  <div id="batchWorkspace" class="feed-batch-workspace"><div class="feed-template-callout"><div><h2>Need the FEED input format?</h2><p>Download the approved minimum-input workbook, complete the FEED tank register, then upload it below.</p></div><button id="batchTemplateBtn" class="feed-template-btn">Download FEED Minimum Input Template ↓</button></div><div id="batchDropZone" class="batch-drop-zone" role="button" tabindex="0" aria-label="Upload FEED tank register files"><div class="upload-icon" aria-hidden="true"><svg viewBox="0 0 120 100" focusable="false"></svg></div><strong>Click to upload tank registers or drag and drop</strong><span>Multiple Excel (.xlsx, .xls) or CSV files accepted • maximum 99 rows</span><input id="batchFileInput" type="file" accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv" multiple /></div><p id="batchFileStatus" class="batch-file-status">No tank register uploaded.</p><details class="batch-columns"><summary>Supported minimum-input fields</summary><p><strong>Required:</strong> Case ID, Tank Tag / Case, Quantity, Stored Liquid, Stored Capacity, Design SG, Design Temperature, Roof System and corrosion allowances.</p><p><strong>Optional:</strong> Design / hydrotest level. When blank, TankM uses the workbook’s disclosed capacity-band level heuristic and labels geometry as assumed for Class 3.</p></details><div class="batch-auto-note"><strong>Automatic workflow:</strong> uploaded rows are validated internally and calculated immediately. Blank template rows are ignored; incomplete or unsupported rows remain visible in the calculation register.</div></div>
+  <div id="batchProgressPanel" class="batch-progress-panel hidden" aria-live="polite"><div class="batch-progress-copy"><span class="batch-progress-step">2</span><div><p class="batch-progress-kicker">FEED batch tank assessment</p><h2 id="batchProgressTitle">Preparing assessment</h2><p id="batchProgressDetail">Waiting for calculation to start.</p></div></div><div class="batch-progress-visual"><div id="batchProgressCircle" class="batch-progress-circle" style="--progress:0"><strong id="batchProgressPercent">0%</strong><small id="batchProgressCount">0 / 0 tanks</small></div><div class="batch-progress-time"><span>Calculation time</span><strong id="batchProgressTime">0.0 s</strong><small id="batchProgressFiles">0 uploaded files</small></div></div><div class="batch-progress-track" role="progressbar" aria-label="Batch estimation progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="batchProgressBar"></i></div></div>
+  <div id="batchResultsPanel" class="card batch-results-panel hidden"><div class="row-between batch-results-head"><div class="batch-results-title"><span class="batch-result-step">3</span><div><h2>Review batch results</h2><p id="batchResultsCaption" class="small muted"></p></div></div><div class="actions"><button id="downloadBatchExcelBtn" class="primary">Download executive Excel report</button><button id="downloadBatchResultsBtn" class="secondary">Export CSV</button></div></div><div id="batchSummary" class="batch-summary-strip"></div><div class="batch-insight-grid"><div><h3>Result distribution</h3><div class="batch-distribution"><div id="batchDonut" class="batch-donut"><strong id="batchDonutTotal">0</strong><small>tanks</small></div><div id="batchLegend" class="batch-legend"></div></div></div><div><h3>Priority actions</h3><div id="batchPriorityActions" class="batch-priority-actions"></div></div></div><p class="batch-percent-note">Percentages are calculated using all imported tank rows.</p><button id="batchRegisterToggleBtn" class="feed-toggle batch-register-toggle" aria-expanded="true">Hide Calculation Register</button><div id="batchRegisterPanel"><div class="batch-register-filters"><input id="batchSearchInput" type="search" placeholder="Search case ID, tank tag, status, exception or source file" aria-label="Search calculation register"/><select id="batchSourceFilter" aria-label="Filter by source file"><option value="">All source files</option></select><select id="batchStatusFilter" aria-label="Filter by status"><option value="">All statuses</option></select></div><div class="table-wrap batch-results-wrap"><table><thead><tr><th>Source</th><th>Case ID</th><th>Tank tag / case</th><th>Status</th><th>Qty</th><th>Diameter</th><th>Height</th><th>Roof</th><th>Weight / tank</th><th>Package weight</th><th>Selected LSTK cost / tank</th><th>Selected LSTK package cost</th><th>Exceptions</th></tr></thead><tbody id="batchResultsBody"></tbody></table></div></div></div>
+</section>
+<section id="basis" class="panel">
+    <div class="panel-head"><div><h1>Phase 1 · Design Basis</h1><p>Enter tank dimensions, liquid level, material and purchaser details.</p></div><div class="code-chip">API 650 §5.2 / Annex L</div></div>
+  <div class="datasheet-wizard card">
+    <div class="row-between"><div><h2><span class="wizard-step">A</span> Datasheet quick entry</h2><p class="muted small">Enter the available datasheet values once. TankM checks the data, converts units, applies visible rules, and fills the normal input screens. No AI or document upload is used.</p></div><span class="pill screening">Browser-only rules</span></div>
+    <div class="wizard-grid">
+      <label>Case / tank tag<input id="wizardCaseName" placeholder="Example: TK-101 crude oil" /></label>
+      <label>Stored liquid<input id="wizardLiquid" value="Crude oil" /></label>
+      <label>Tank quantity<input id="wizardQuantity" type="number" min="1" step="1" value="1" /></label>
+      <label>Stored capacity (m³)<input id="wizardCapacity" type="number" min="1" step="1" placeholder="Example: 60000" /></label>
+      <label>Design / hydrotest level (m)<input id="wizardLevel" type="number" min="0.1" step="0.01" placeholder="Example: 17.75" /></label>
+      <label>Design SG<input id="wizardSG" type="number" min="0.01" max="2" step="0.001" placeholder="Example: 0.888" /></label>
+      <label>Design temperature (°C)<input id="wizardTemp" type="number" step="1" value="65" /></label>
+      <label>MDMT (°C)<input id="wizardMdmt" type="number" step="0.1" value="11.3" /></label>
+      <label>Wind speed<div class="wizard-unit-field"><input id="wizardWind" type="number" min="0" step="0.1" placeholder="Example: 65" /><select id="wizardWindUnit" aria-label="Wind-speed unit"><option value="ms">m/s</option><option value="kmh">km/h</option></select></div></label>
+      <label>Roof type<select id="wizardRoof"><option value="efr-double">External floating roof — double deck</option><option value="efr-single">External floating roof — single deck</option><option value="ifr">Internal floating roof + fixed roof</option><option value="fixed">Fixed cone roof</option></select></label>
+      <label>Bottom-shell CA (mm)<input id="wizardBottomShellCA" type="number" min="0" step="0.5" value="3" /></label>
+      <label>Other-shell CA (mm)<input id="wizardUpperShellCA" type="number" min="0" step="0.5" value="1.5" /></label>
+      <label>Bottom / annular CA (mm)<input id="wizardBottomCA" type="number" min="0" step="0.5" value="3" /></label>
+      <label>Roof CA (mm)<input id="wizardRoofCA" type="number" min="0" step="0.5" value="1" /></label>
+    </div>
+    <div class="wizard-actions"><label class="check"><input id="wizardSeismic" type="checkbox" checked /> Annex E seismic required</label><button id="wizardExampleBtn" class="secondary" type="button">Load 60,000 m³ example</button><button id="applyDatasheetBtn" class="primary" type="button">Check & apply datasheet values</button></div>
+    <div id="wizardStatus" class="wizard-status">Enter capacity, liquid level and SG to begin. TankM will not calculate until required values are present.</div>
+  </div>
+  <div class="grid two">
+    <div class="card"><h2><span class="wizard-step">1</span> Geometry & service</h2><div class="form-grid">
+      <label>Case name<input id="caseName" value="TankM Class 3 Screening Case" /></label>
+      <label>Calculation mode<select id="calculationMode"><option value="governed">Governed Design + Estimate</option><option value="class3-screening" selected>Class 3 Screening with explicit extrapolation</option></select></label>
+      <label>Stored liquid<input id="storedLiquid" value="Hydrocarbon" /></label>
+      <label>Tank quantity<input id="tankQuantity" type="number" min="1" step="1" value="1" /></label>
+      <label>Geometry basis<select id="geometryBasis"><option>Confirmed GA</option><option>Confirmed datasheet</option><option selected>Inferred from capacity</option><option>Assumed for Class 3</option></select></label>
+      <label>Original design code / vintage<select id="designCodeVintage"><option>Unknown / not stated</option><option>API 650 9th Ed. 1993</option><option>API 650 10th Ed.</option><option>API 650 11th Ed.</option><option>API 650 12th Ed.</option><option>API 650 13th Ed.</option><option selected>Current project basis</option></select></label>
+      <label>Actual / As-Built empty weight (MT, optional)<input id="actualEmptyWeightMT" type="number" step="0.1" value="0" /></label>
+      <label>Nominal capacity (m³, optional)<input id="nominalCapacityM3" type="number" step="1" value="0" /></label>
+      <label>Stored capacity (m³, optional)<input id="storedCapacityM3" type="number" step="1" value="0" /></label>
+      <label>Screening freeboard assumption (m)<input id="screeningFreeboardM" type="number" step="0.1" value="2" /></label>
+      <label>Tank ID, D (m)<input id="diameter" type="number" step="0.1" value="30" /></label>
+      <label>Shell height (m)<input id="shellHeight" type="number" step="0.1" value="15" /></label>
+      <label>Design product level (m)<input id="designLevel" type="number" step="0.01" value="14.5" /></label>
+      <label>Hydrotest level (m)<input id="hydroLevel" type="number" step="0.01" value="14.5" /></label>
+      <label>Design SG<input id="designSG" type="number" step="0.001" value="0.9" /></label>
+      <label>Design temperature (°C)<input id="designTemp" type="number" step="1" value="65" /></label>
+      <label>MDMT (°C)<input id="mdmt" type="number" step="1" value="5" /></label>
+      <label>Internal design pressure (kPa g)<input id="internalPressure" type="number" step="0.01" value="0" /></label>
+      <label>External design pressure (kPa)<input id="externalPressure" type="number" step="0.01" value="0" /></label>
+      <label>Wind speed (km/h)<input id="windSpeed" type="number" step="1" value="180" /></label>
+      <label class="check"><input id="seismic" type="checkbox" checked /> Annex E seismic required</label>
+      <label>Roof type<select id="roofType"><option value="fixed">Fixed cone roof</option><option value="ifr">IFR + fixed cone roof</option><option value="efr">External floating roof</option></select></label>
+      <label>EFR subtype<select id="floatingRoofSubtype"><option value="single">Single deck</option><option value="double">Double deck</option></select></label>
+      <label>Anchorage<select id="anchorage"><option>Auto</option><option>Anchored</option><option>Self-anchored</option></select></label>
+    </div><div class="actions compact"><button id="inferGeometryBtn" class="secondary action-infer" type="button">Infer geometry for Class 3</button></div><div class="callout"><strong>Dual-mode rule:</strong> Governed Design stops shell release outside implemented API scope. Class 3 Screening can continue only with visible assumptions. Capacity-based geometry inference is an estimating aid, never a drawing dimension.</div></div>
+    <div class="card"><h2><span class="wizard-step">2</span> Material, corrosion & plate selection</h2><div class="form-grid">
+      <label>Shell material<select id="shellMaterial"></select></label>
+      <label>API material group<select id="shellGroup"></select></label>
+      <label>Bottom shell CA (mm)<input id="caBottomShell" type="number" step="0.5" value="1.5" /></label>
+      <label>Other shell CA (mm)<input id="caUpperShell" type="number" step="0.5" value="1.5" /></label>
+      <label>Bottom CA (mm)<input id="bottomCA" type="number" step="0.5" value="0" /></label>
+      <label>Annular CA (mm)<input id="annularCA" type="number" step="0.5" value="0" /></label>
+      <label>Roof CA (mm)<input id="roofCA" type="number" step="0.5" value="0.5" /></label>
+      <label>Target course height (m)<input id="courseHeight" type="number" step="0.1" value="2" /></label>
+      <label>Fallback plate step (mm)<input id="plateStep" type="number" step="0.5" value="2" /></label>
+      <label>Plate series<input id="plateSeries" value="6,8,10,12,14,16,18,20,22,24,28,32" /></label>
+      <label>Recommendation mode<select id="recommendedThicknessMode"><option value="validated-series">Recommended Thickness after Code Requirement</option><option value="code-only">Code/project governing thickness only</option></select></label>
+      <label>Steel density (kg/m³)<input id="steelDensity" type="number" value="7850" /></label>
+      <label>Other appurtenances (% explicit core)<input id="appurtenancePct" type="number" step="0.5" value="8" /></label>
+    </div><div class="callout"><strong>Plate-series governance:</strong> the default series remains the 11-family observed series. TankM lets the project edit it instead of hard-coding it as a universal fabrication rule.</div></div>
+  </div>
+  <div class="card"><div class="row-between"><div><h2><span class="wizard-step">3</span> Shell course definition</h2><p class="muted small">Generate courses, then review the values.</p></div><button id="generateCoursesBtn" class="secondary action-generate">Generate courses</button></div><div class="table-wrap"><table id="courseInputTable"><thead><tr><th>Course</th><th>Height m</th><th>Material</th><th>Group</th><th>CA mm</th><th>Role</th><th>Project min mm</th><th>Structural nominal mm</th></tr></thead><tbody></tbody></table></div></div>
+  <div id="geometryEquationFlow" class="equation-guide"></div>
+</section>
+
+<section id="shell" class="panel">
+  <div class="panel-head"><div><h1>Phase 2 · Shell Governing Stack</h1><p>Governed 1-foot calculation inside scope; explicitly labelled non-code weight proxy in Class 3 mode when D exceeds 61 m.</p></div><div class="code-chip">API 650 §5.6</div></div>
+  <div class="grid three"><div class="kpi"><span>Method</span><strong id="shellMethod">-</strong></div><div class="kpi"><span>Pressure head</span><strong id="pressureHead">-</strong></div><div class="kpi"><span>Code minimum</span><strong id="shellCodeMin">-</strong></div></div>
+  <div class="card"><div class="table-wrap"><table id="shellResultTable"><thead><tr><th>Crs</th><th>Bottom EL</th><th>H prod</th><th>td</th><th>tt</th><th>Code min</th><th>Calculated selected</th><th>Project min</th><th>Recommended Thickness after Code Requirement</th><th>Governing</th><th>DMT</th></tr></thead><tbody></tbody></table></div></div>
+  <div class="card"><h2>Shell notes</h2><div id="shellNotes" class="notes"></div></div>
+  <div id="shellEquationFlow" class="equation-guide"></div>
+</section>
+
+<section id="bottom" class="panel">
+  <div class="panel-head"><div><h1>Phase 3 · Bottom & Annular</h1><p>API screening plus explicit drawing/project override inputs.</p></div><div class="code-chip">API 650 §5.4 / §5.5</div></div>
+  <div class="grid two"><div class="card"><h2>Class 3 automatic selection</h2><label class="check"><input id="annularAutoClass3" type="checkbox" checked /> Automatically select annular plate for Class 3 tanks above 61 m</label><div class="callout">When selected, TankM requires an annular plate for a large Class 3 tank, calculates its thickness from the screening table, and rounds calculated radial width up to the next 100 mm. This is a FEED screening assumption, not a drawing release.</div><label class="check owner-contingency"><input id="ownerClass3AnnularContingency" type="checkbox" checked /> Apply owner Class 3 annular contingency: 2.0× calculated width and 14 mm minimum thickness</label><div class="callout warning-callout">This is an owner estimating rule only. It does not replace API 650 or an approved project/GAD annular requirement. It applies only in Class 3 Screening mode.</div><label class="check"><input id="forceAnnular" type="checkbox" /> Force annular by project requirement</label><details class="engineering-overrides"><summary>Engineering overrides (only when verified)</summary><div class="form-grid"><label>Bottom plate override (mm)<input id="bottomPlateOverrideMm" type="number" step="0.5" value="0" /></label><label>Annular thickness override (mm)<input id="annularThicknessOverrideMm" type="number" step="0.5" value="0" /></label><label>Annular radial width override (mm)<input id="annularWidthOverrideMm" type="number" step="1" value="0" /></label></div></details></div><div class="card"><h2>Result</h2><div id="bottomDetails" class="definition-list"></div></div></div>
+  <div id="bottomEquationFlow" class="equation-guide"></div>
+</section>
+
+<section id="roof" class="panel">
+  <div class="panel-head"><div><h1>Phase 4 · Fixed Roof</h1><p>Plate and structural dead-load MTO. Member design remains REVIEW.</p></div><div class="code-chip">API 650 §5.10</div></div>
+  <div class="grid two"><div class="card"><h2>Inputs</h2><div class="form-grid"><label>Roof slope, 1:N<input id="roofSlope" type="number" step="1" value="16" /></label><label>Roof plate override (mm)<input id="roofPlateOverrideMm" type="number" step="0.5" value="0" /></label><label>Roof structure allowance (kg/m²)<input id="roofStructureKgM2" type="number" step="1" value="18" /></label></div></div><div class="card"><h2>Result</h2><div id="roofDetails" class="definition-list"></div></div></div>
+</section>
+
+<section id="wind" class="panel">
+  <div class="panel-head"><div><h1>Phase 5 · Wind / Stiffening MTO</h1><p>Entered/verified wind-girder quantities feed weight. Detailed H1/buckling design remains REVIEW.</p></div><div class="code-chip">API 650 §5.9</div></div>
+  <div class="grid two"><div class="card"><div class="form-grid"><label>Wind girder count<input id="windGirderCount" type="number" step="1" value="0" /></label><label>Wind girder unit mass (kg/m perimeter)<input id="windGirderKgPerM" type="number" step="1" value="0" /></label></div></div><div class="card"><div id="windDetails" class="definition-list"></div></div></div>
+</section>
+
+<section id="pressure" class="panel"><div class="panel-head"><div><h1>Phase 6 · Pressure & Anchorage</h1><p>Governance status for Annex F and anchorage.</p></div><div class="code-chip">Annex F / §5.12</div></div><div class="card"><div id="pressureDetails" class="definition-list"></div></div></section>
+<section id="seismicPanel" class="panel"><div class="panel-head"><div><h1>Phase 7 · Seismic</h1><p>Input gate and design-release limitation.</p></div><div class="code-chip">Annex E</div></div><div class="card"><div id="seismicDetails" class="definition-list"></div></div></section>
+
+<section id="floating" class="panel">
+  <div class="panel-head"><div><h1>Phase 8 · Floating Roof</h1><p>Roof-type-specific mass basis with out-of-domain warning for double-deck EFR.</p></div><div class="code-chip">Annex C / Annex H</div></div>
+  <div class="grid two"><div class="card"><h2>Input</h2><div class="form-grid"><label>Floating roof dead-load basis (kg/m²; 0 = TankM default)<input id="floatingRoofKgM2" type="number" step="1" value="0" /></label></div><div class="callout">IFR default = 38 kg/m². Single-deck EFR default = 52 kg/m². In Class 3 Screening only, double-deck EFR may use the TankM external As-Built screening anchor of 115.8 kg/m² when 0 is entered. Governed Design still HOLDS without a verified double-deck basis.</div></div><div class="card"><h2>Result</h2><div id="floatingDetails" class="definition-list"></div></div></div>
+</section>
+
+<section id="openings" class="panel">
+  <div class="panel-head"><div><h1>Phase 9 · Nozzles & Manholes</h1><p>Explicit MTO allowance only. Detailed reinforcement remains REVIEW.</p></div><div class="code-chip">§5.7 / Annex P</div></div>
+  <div class="grid two"><div class="card"><div class="form-grid"><label>Nozzle count<input id="nozzleCount" type="number" step="1" value="0" /></label><label>Manhole count<input id="manholeCount" type="number" step="1" value="0" /></label><label>Verified openings weight (MT)<input id="openingsWeightMT" type="number" step="0.1" value="0" /></label></div></div><div class="card"><div id="openingsDetails" class="definition-list"></div></div></div>
+</section>
+
+<section id="mto" class="panel">
+  <div class="panel-head"><div><h1>Phase 10 · Weight / MTO</h1><p>First-principles core MTO plus calibrated complete-empty-weight prediction and Class 3 range.</p></div><div class="code-chip">Owner Estimating Layer</div></div>
+  <div class="grid four"><div class="kpi"><span>Core MTO</span><strong id="coreMto">-</strong></div><div class="kpi"><span>Calibrated empty</span><strong id="calibratedWeight">-</strong></div><div class="kpi"><span>Class 3 weight range</span><strong id="class3WeightRange">-</strong></div><div class="kpi"><span>Validation vs actual</span><strong id="validationVariance">-</strong></div></div>
+  <div class="card"><div class="table-wrap"><table id="mtoTable"><thead><tr><th>Component</th><th>Basis</th><th>Quantity</th><th>Thickness / rate</th><th>Weight MT</th></tr></thead><tbody></tbody></table></div></div>
+  <div class="grid two"><div class="card"><h2>Calibration diagnostics</h2><div id="calibrationDetails" class="definition-list"></div></div><div class="card"><h2>Domain & governance</h2><div id="calibrationNotes" class="notes"></div></div></div>
+  <details class="card calibration-audit"><summary>Calibration Audit Trail</summary><div id="calibrationAuditBody"></div></details>
+  <div id="mtoEquationFlow" class="equation-guide"></div>
+</section>
+
+<section id="cost" class="panel">
+  <div class="panel-head"><div><h1>Phase 11 · Owner Cost Intelligence</h1><p>Applies scope-governed historical NREP LSTK billing indices. The model does not treat PO Supply as pure fabrication or the remaining LSTK billing as erection-only cost.</p></div><div class="code-chip">Commercial Class 3 screening, not API 650</div></div>
+  <div class="grid four">
+    <div class="kpi"><span>Raw steel normalization basis</span><strong id="rawSteelBasisCost">-</strong></div>
+    <div class="kpi accent-material"><span>PO Supply Billing benchmark</span><strong id="supplyBillingCost">-</strong></div>
+    <div class="kpi accent-service"><span>Non-supply LSTK billing remainder</span><strong id="nonSupplyLSTKCost">-</strong></div>
+    <div class="kpi accent-total"><span>Selected LSTK package cost</span><strong id="baseLSTKCost">-</strong></div>
+  </div>
+  <div class="grid two">
+    <div class="card"><h2>Scope-governed Idiot Index inputs</h2><div class="form-grid">
+      <label>Estimate year<select id="estimateYear"><option>2021</option><option>2022</option><option>2023</option><option>2024</option><option>2025</option><option selected>2026</option></select></label>
+      <label>Raw steel override INR/kg (0 = library)<input id="rawSteelRateOverride" type="number" step="0.1" value="0" /></label>
+      <label>PO Supply Billing Index override (0 = 2.15)<input id="supplyBillingIdiotIndexOverride" type="number" step="0.001" value="0" /></label>
+      <label>Base LSTK Index override (0 = 4.77)<input id="baseLSTKIdiotIndexOverride" type="number" step="0.001" value="0" /></label>
+      <label>Reference LSTK Index override (0 = 4.80)<input id="referenceLSTKIdiotIndexOverride" type="number" step="0.001" value="0" /></label>
+      <label>Weight basis<select id="costWeightBasis"><option value="calibrated">Calibrated complete empty weight</option><option value="core">Core MTO only</option></select></label>
+      <label>Class 3 low (%)<input id="class3LowPct" type="number" step="1" value="-20" /></label>
+      <label>Class 3 high (%)<input id="class3HighPct" type="number" step="1" value="30" /></label>
+      <label class="check"><input id="includeGroundReference" type="checkbox" /> Use Reference LSTK with comparable direct ground-improvement increment</label>
+    </div><div class="callout"><strong>Scope rule:</strong> PO Supply Billing Index = 2.15 is a procurement billing benchmark, not a fabrication factor. Base LSTK Index = 4.77 represents the broad installed tank package and includes foundation/civil plus multidisciplinary scope in the historical contracts. The 2.62 difference is the non-supply LSTK billing remainder, not erection labour. Use Reference LSTK 4.80 only when comparable directly attributable ground improvement is intentionally in scope.</div></div>
+    <div class="card"><h2>Cost reconciliation and scope check</h2><div id="costDetails" class="definition-list"></div><div id="costNotes" class="notes"></div></div>
+  </div>
+  <div class="card"><h2>Class 3 LSTK cost range</h2><div class="table-wrap"><table><thead><tr><th>Cost layer</th><th>Low</th><th>Base</th><th>High</th><th>Factor</th></tr></thead><tbody id="costRangeTableBody"></tbody></table></div></div>
+  <div class="card"><h2>Optional independent bottom-up cross-check</h2><p class="muted small">These fields are a separate estimator cross-check. They are not added on top of the Idiot Index result.</p><div class="form-grid six"><label>Material INR/kg<input id="materialRate" type="number" value="0" /></label><label>Fabrication INR/kg<input id="fabRate" type="number" value="0" /></label><label>Engineering %<input id="engineeringPct" type="number" value="0" /></label><label>Civil lakh<input id="civilLakh" type="number" value="0" /></label><label>E&I/FF lakh<input id="eiLakh" type="number" value="0" /></label><label>Other lakh<input id="otherLakh" type="number" value="0" /></label><label>Contingency %<input id="contingencyPct" type="number" value="0" /></label><label>Escalation %<input id="escalationPct" type="number" value="0" /></label></div></div>
+  <div id="costEquationFlow" class="equation-guide"></div>
+</section>
+
+<section id="validation" class="panel">
+  <div class="panel-head"><div><h1>Validation Lab</h1><p>Class 3 performance, calibration evidence and user-entered As-Built checks.</p></div><div class="code-chip">Model Governance</div></div>
+  <div class="grid four"><div class="kpi"><span>Class 3 target</span><strong>-20% / +30%</strong></div><div class="kpi"><span>Legacy global LOOCV</span><strong>9.57%</strong></div><div class="kpi"><span>Bootstrap OOB median</span><strong>10.11%</strong></div><div class="kpi"><span>Cross-phase</span><strong>18.15–27.79%</strong></div></div>
+  <div class="grid two"><div class="card"><h2>Current case vs As-Built</h2><div id="caseValidation" class="definition-list"></div></div><div class="card"><h2>Calibration anchor</h2><div id="anchorValidation" class="definition-list"></div></div></div>
+  <div class="card scenario-playground">
+    <div class="row-between"><div><h2><span class="equation-number">8</span>Scenario Playground <span class="muted">(What-if Analysis)</span></h2><p class="muted small">Adjust controlled estimating inputs and see the impact immediately. These scenarios never change the active TankM case.</p></div><div class="actions"><label class="check scenario-auto"><input id="scenarioAutoRun" type="checkbox" checked /> Instant update</label><button id="scenarioRunBtn" type="button" class="secondary">Update scenario</button></div></div>
+    <div class="scenario-tabs" role="tablist"><button class="scenario-tab active" data-scenario="base" type="button">Base case</button><button class="scenario-tab" data-scenario="a" type="button">Scenario A</button><button class="scenario-tab" data-scenario="b" type="button">Scenario B</button><button class="scenario-tab" data-scenario="c" type="button">Scenario C</button></div>
+    <div class="scenario-grid"><div class="scenario-controls">
+      <label>Design liquid level (m)<input id="scenarioLevel" type="range" min="1" max="35" step="0.1" /><output id="scenarioLevelOut"></output></label>
+      <label>Design specific gravity<input id="scenarioSG" type="range" min="0.65" max="1.20" step="0.005" /><output id="scenarioSGOut"></output></label>
+      <label>Bottom-shell corrosion allowance (mm)<input id="scenarioBottomShellCA" type="range" min="0" max="6" step="0.5" /><output id="scenarioBottomShellCAOut"></output></label>
+      <label>Upper-shell corrosion allowance (mm)<input id="scenarioUpperShellCA" type="range" min="0" max="4" step="0.5" /><output id="scenarioUpperShellCAOut"></output></label>
+      <label>Raw steel rate (₹/kg)<input id="scenarioSteelRate" type="range" min="35" max="100" step="0.5" /><output id="scenarioSteelRateOut"></output></label>
+    </div><div class="scenario-settings">
+      <label>Shell material<select id="scenarioMaterial"></select></label>
+      <label>Roof type<select id="scenarioRoofType"><option value="efr-double">External floating roof — double deck</option><option value="efr-single">External floating roof — single deck</option><option value="ifr">Internal floating roof + fixed roof</option><option value="fixed">Fixed cone roof</option></select></label>
+      <label>Calculation mode<select id="scenarioMode"><option value="governed">Governed design</option><option value="class3-screening">Class 3 screening</option></select></label>
+      <div class="scenario-kpis"><div><span>Complete weight</span><strong id="scenarioWeight">–</strong></div><div><span>Selected LSTK cost</span><strong id="scenarioCost">–</strong></div><div><span>Bottom-course plate</span><strong id="scenarioBottomCourse">–</strong></div><div><span>Estimate status</span><strong id="scenarioStatus">–</strong></div></div>
+      <div id="scenarioNote" class="scenario-note">The base case is copied from the active TankM inputs.</div>
+    </div></div>
+    <div class="scenario-compare"><h3>Compare scenarios</h3><div class="table-wrap"><table><thead><tr><th>Scenario</th><th>Liquid level</th><th>SG</th><th>Shell CA</th><th>Material</th><th>Complete weight</th><th>Selected LSTK cost</th><th>Status</th></tr></thead><tbody id="scenarioCompareBody"></tbody></table></div><div id="scenarioBars" class="scenario-bars"></div></div>
+  </div>
+  <div class="card"><h2>Governance interpretation</h2><div class="notes"><div class="note warning-note"><strong>Do not optimize every tank to 0% error.</strong> The primary product objective is a governed Class 3 estimate with high hit rate and controlled bias.</div><div class="note">The 20 m IFR tank is calibration data. Its exact reproduction is an in-sample check only.</div><div class="note">Legacy API edition is recorded as metadata. this release does not apply a blind code-vintage weight multiplier because project specification, CA, roof configuration and fabrication practice can dominate the observed difference.</div></div></div>
+</section>
+
+<section id="report" class="panel">
+  <div class="panel-head"><div><h1>Engineering Report</h1><p>Auditable engineering status, Class 3 screening status, assumptions, MTO and owner cost summary.</p></div><div class="actions"><button id="exportCsvBtn" class="secondary">Export MTO CSV</button><button id="exportCostCsvBtn" class="secondary">Export Cost CSV</button><button id="printBtn" class="primary">Print / Save PDF</button></div></div>
+  <div class="card report-card"><h2 id="reportTitle">Preliminary Tank Engineering &amp; Class 3 Owner Cost Report</h2><p id="reportCaseSubtitle" class="report-case-subtitle"></p><div id="reportBody"></div></div>
+</section>
+</section>
+</main>
+<script src="calibration.js"></script>
+<script src="cost-data.js"></script>
+<script src="engine.js"></script>
+<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="batch.js?v=20260827-scope-governed"></script>
+<script src="ai.js"></script>
+</body>
+</html>
+
