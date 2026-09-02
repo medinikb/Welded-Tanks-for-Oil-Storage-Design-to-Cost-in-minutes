@@ -1,0 +1,6 @@
+# Graphify generated knowledge graph and local runtime state
+graphify-out/
+
+# Common local/editor files
+.DS_Store
+Thumbs.db
